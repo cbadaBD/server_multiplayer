@@ -1,0 +1,2720 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Left 4 Dead 3D</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: #000;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+}
+
+/* ================================================= */
+/* HUD */
+/* ================================================= */
+
+#hud {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+    color: white;
+}
+
+/* ================================================= */
+/* TOP LEFT */
+/* ================================================= */
+
+#top {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+
+    padding: 10px 16px;
+
+    background: rgba(0, 0, 0, 0.65);
+
+    border-radius: 10px;
+
+    font-size: 14px;
+
+    text-shadow:
+        0 1px 3px #000;
+}
+
+#top b {
+    color: #f1c40f;
+}
+
+#top .k {
+    color: #e74c3c;
+}
+
+/* ================================================= */
+/* ONLINE */
+/* ================================================= */
+
+#online {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+
+    padding: 10px 16px;
+
+    background: rgba(0, 0, 0, 0.65);
+
+    border-radius: 10px;
+
+    font-size: 14px;
+}
+
+#online b {
+    color: #2ecc71;
+    font-size: 17px;
+}
+
+/* ================================================= */
+/* HP */
+/* ================================================= */
+
+#hpw {
+    position: absolute;
+
+    bottom: 30px;
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    width: 280px;
+    height: 18px;
+
+    background:
+        rgba(0, 0, 0, 0.75);
+
+    border:
+        2px solid
+        rgba(255, 255, 255, 0.2);
+
+    border-radius: 10px;
+
+    overflow: hidden;
+}
+
+#hp {
+    width: 100%;
+    height: 100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            #e74c3c,
+            #f1c40f,
+            #2ecc71
+        );
+
+    transition:
+        width 0.15s;
+}
+
+#hpt {
+    position: absolute;
+
+    bottom: 32px;
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+    text-shadow:
+        0 1px 4px #000;
+}
+
+/* ================================================= */
+/* CROSSHAIR */
+/* ================================================= */
+
+#ch {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    width: 26px;
+    height: 26px;
+
+    transform:
+        translate(-50%, -50%);
+}
+
+#ch::before {
+    content: '';
+
+    position: absolute;
+
+    left: 12px;
+    top: 0;
+
+    width: 2px;
+    height: 26px;
+
+    background: white;
+
+    box-shadow:
+        0 0 4px #000;
+}
+
+#ch::after {
+    content: '';
+
+    position: absolute;
+
+    left: 0;
+    top: 12px;
+
+    width: 26px;
+    height: 2px;
+
+    background: white;
+
+    box-shadow:
+        0 0 4px #000;
+}
+
+/* ================================================= */
+/* MOUSE STATUS */
+/* ================================================= */
+
+#mouseStatus {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    transform:
+        translate(-50%, 25px);
+
+    color:
+        rgba(255, 255, 255, 0.85);
+
+    font-size: 12px;
+
+    text-shadow:
+        0 1px 4px #000;
+
+    opacity: 0;
+
+    transition:
+        opacity 0.2s;
+}
+
+#mouseStatus.show {
+    opacity: 1;
+}
+
+/* ================================================= */
+/* CHAT */
+/* ================================================= */
+
+#chat {
+    position: absolute;
+
+    left: 16px;
+    bottom: 80px;
+
+    width: 350px;
+    max-height: 190px;
+
+    overflow: hidden;
+
+    font-size: 13px;
+
+    text-shadow:
+        0 1px 3px #000;
+}
+
+#chat .w {
+    color: #f1c40f;
+    font-weight: bold;
+}
+
+#ci {
+    position: absolute;
+
+    left: 16px;
+    bottom: 16px;
+
+    width: 350px;
+
+    padding: 9px 12px;
+
+    display: none;
+
+    pointer-events: auto;
+
+    background:
+        rgba(0, 0, 0, 0.9);
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.3);
+
+    border-radius: 8px;
+
+    color: white;
+
+    outline: none;
+
+    font-size: 14px;
+
+    z-index: 30;
+}
+
+#ci.show {
+    display: block;
+}
+
+/* ================================================= */
+/* MUERTE */
+/* ================================================= */
+
+#dead {
+    position: fixed;
+    inset: 0;
+
+    display: none;
+
+    justify-content: center;
+    align-items: center;
+
+    background:
+        rgba(120, 0, 0, 0.38);
+
+    color: white;
+
+    font-size: 50px;
+
+    font-weight: 900;
+
+    text-shadow:
+        0 0 30px #000;
+
+    z-index: 20;
+}
+
+#dead.show {
+    display: flex;
+}
+
+/* ================================================= */
+/* LOGIN */
+/* ================================================= */
+
+#login {
+    position: fixed;
+    inset: 0;
+
+    z-index: 50;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: center;
+
+    background:
+        rgba(0, 0, 0, 0.94);
+
+    color: white;
+}
+
+#login.hidden {
+    display: none;
+}
+
+#login h1 {
+    margin: 0 0 25px 0;
+
+    color: #e74c3c;
+
+    font-size: 48px;
+
+    letter-spacing: 4px;
+
+    text-align: center;
+
+    text-shadow:
+        0 0 40px
+        rgba(231, 76, 60, 0.6);
+}
+
+#login input {
+    width: 280px;
+
+    padding: 12px 16px;
+
+    margin: 6px 0;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.2);
+
+    border-radius: 8px;
+
+    outline: none;
+
+    background:
+        rgba(255, 255, 255, 0.07);
+
+    color: white;
+
+    font-size: 15px;
+}
+
+#login input:focus {
+    border-color: #e74c3c;
+}
+
+#login button {
+    margin-top: 14px;
+
+    padding: 14px 50px;
+
+    border: none;
+
+    border-radius: 50px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #e74c3c,
+            #c0392b
+        );
+
+    color: white;
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+    letter-spacing: 2px;
+
+    cursor: pointer;
+}
+
+#login button:hover {
+    transform: scale(1.04);
+}
+
+#login .hint {
+    margin-top: 18px;
+
+    color: #888;
+
+    font-size: 12px;
+
+    text-align: center;
+
+    line-height: 1.8;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- ================================================= -->
+<!-- HUD -->
+<!-- ================================================= -->
+
+<div id="hud">
+
+    <div id="top">
+
+        🏆
+        <b id="s">0</b>
+
+        &nbsp;&nbsp;
+
+        💀
+        <span
+            class="k"
+            id="k"
+        >0</span>
+
+    </div>
+
+    <div id="online">
+
+        🌐
+        <b id="on">0</b>
+
+    </div>
+
+    <div id="hpw">
+
+        <div id="hp"></div>
+
+    </div>
+
+    <div id="hpt">
+        100 / 100
+    </div>
+
+    <div id="ch"></div>
+
+    <div id="mouseStatus">
+        Clic para capturar el mouse
+    </div>
+
+    <div id="chat"></div>
+
+    <input
+        id="ci"
+        maxlength="100"
+        autocomplete="off"
+        placeholder="Mensaje — Enter para enviar"
+    >
+
+    <div id="dead">
+        💀 MUERTO
+    </div>
+
+</div>
+
+<!-- ================================================= -->
+<!-- LOGIN -->
+<!-- ================================================= -->
+
+<div id="login">
+
+    <h1>
+        LEFT 4 DEAD 3D
+    </h1>
+
+    <input
+        id="name"
+        maxlength="16"
+        autocomplete="off"
+        placeholder="Tu nombre"
+    >
+
+    <button id="join">
+        ▶ CONECTAR
+    </button>
+
+    <div class="hint">
+
+        WASD mover · Ratón apuntar · Clic disparar · T chat
+
+        <br>
+
+        Primer clic captura el mouse · ESC libera el mouse
+
+    </div>
+
+</div>
+
+<!-- ================================================= -->
+<!-- SOCKET.IO -->
+<!-- ================================================= -->
+
+<script src="/socket.io/socket.io.js"></script>
+
+<!-- ================================================= -->
+<!-- THREE.JS -->
+<!-- ================================================= -->
+
+<script type="importmap">
+
+{
+    "imports": {
+        "three": "https://unpkg.com/three@0.126.0/build/three.module.js"
+    }
+}
+
+</script>
+
+<script type="module">
+
+import * as THREE from 'three';
+
+/* ================================================= */
+/* DOM */
+/* ================================================= */
+
+function $(id) {
+    return document.getElementById(id);
+}
+
+const hpEl =
+    $('hp');
+
+const hptEl =
+    $('hpt');
+
+const sEl =
+    $('s');
+
+const kEl =
+    $('k');
+
+const onEl =
+    $('on');
+
+const chatEl =
+    $('chat');
+
+const ciEl =
+    $('ci');
+
+const deadEl =
+    $('dead');
+
+const loginEl =
+    $('login');
+
+const nameEl =
+    $('name');
+
+const mouseStatusEl =
+    $('mouseStatus');
+
+/* ================================================= */
+/* THREE SCENE */
+/* ================================================= */
+
+const scene =
+    new THREE.Scene();
+
+scene.background =
+    new THREE.Color(
+        0x1a1a2e
+    );
+
+scene.fog =
+    new THREE.Fog(
+        0x1a1a2e,
+        45,
+        120
+    );
+
+/* ================================================= */
+/* RENDERER */
+/* ================================================= */
+
+const renderer =
+    new THREE.WebGLRenderer(
+        {
+            antialias: true
+        }
+    );
+
+renderer.setPixelRatio(
+    Math.min(
+        window.devicePixelRatio || 1,
+        2
+    )
+);
+
+renderer.setSize(
+    window.innerWidth,
+    window.innerHeight
+);
+
+renderer.shadowMap.enabled =
+    true;
+
+renderer.shadowMap.type =
+    THREE.PCFSoftShadowMap;
+
+renderer.domElement.tabIndex =
+    0;
+
+renderer.domElement.style.outline =
+    'none';
+
+document.body.prepend(
+    renderer.domElement
+);
+
+/* ================================================= */
+/* CAMERA */
+/* ================================================= */
+
+const camera =
+    new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth /
+            window.innerHeight,
+        0.1,
+        300
+    );
+
+/*
+ * ==========================================================
+ * IMPORTANTE: orden de rotación 'YXZ'.
+ *
+ * Esto es exactamente lo que usa un control FPS estándar
+ * (igual que THREE.PointerLockControls): primero yaw
+ * (rotación horizontal en Y), luego pitch (rotación
+ * vertical en X). Fijar camera.rotation directamente
+ * (en vez de recalcular con lookAt() cada frame) evita
+ * cualquier problema de "roll"/inclinación inesperada al
+ * mirar cerca de los límites verticales.
+ * ==========================================================
+ */
+
+camera.rotation.order =
+    'YXZ';
+
+camera.position.set(
+    0,
+    1.65,
+    0
+);
+
+/* ================================================= */
+/* LUCES */
+/* ================================================= */
+
+const ambient =
+    new THREE.AmbientLight(
+        0x9090b0,
+        1.1
+    );
+
+scene.add(
+    ambient
+);
+
+const sun =
+    new THREE.DirectionalLight(
+        0xffffff,
+        1.3
+    );
+
+sun.position.set(
+    20,
+    40,
+    20
+);
+
+sun.castShadow =
+    true;
+
+sun.shadow.mapSize.width =
+    2048;
+
+sun.shadow.mapSize.height =
+    2048;
+
+scene.add(
+    sun
+);
+
+const hemi =
+    new THREE.HemisphereLight(
+        0x8899ff,
+        0x223322,
+        0.6
+    );
+
+scene.add(
+    hemi
+);
+
+/* ================================================= */
+/* SUELO */
+/* ================================================= */
+
+const ground =
+    new THREE.Mesh(
+        new THREE.PlaneGeometry(
+            200,
+            200
+        ),
+        new THREE.MeshStandardMaterial(
+            {
+                color: 0x2a2a4a,
+                roughness: 0.9
+            }
+        )
+    );
+
+ground.rotation.x =
+    -Math.PI / 2;
+
+ground.receiveShadow =
+    true;
+
+scene.add(
+    ground
+);
+
+/* ================================================= */
+/* GRID */
+/* ================================================= */
+
+const grid =
+    new THREE.GridHelper(
+        200,
+        40,
+        0x6666aa,
+        0x444466
+    );
+
+grid.position.y =
+    0.01;
+
+scene.add(
+    grid
+);
+
+/* ================================================= */
+/* ÁRBOLES */
+/* ================================================= */
+
+const trunk =
+    new THREE.InstancedMesh(
+
+        new THREE.CylinderGeometry(
+            0.4,
+            0.5,
+            2.5,
+            8
+        ),
+
+        new THREE.MeshStandardMaterial(
+            {
+                color: 0x8b5a2b
+            }
+        ),
+
+        80
+
+    );
+
+const crown =
+    new THREE.InstancedMesh(
+
+        new THREE.SphereGeometry(
+            1.2,
+            8,
+            8
+        ),
+
+        new THREE.MeshStandardMaterial(
+            {
+                color: 0x2e8b57
+            }
+        ),
+
+        80
+
+    );
+
+const treeDummy =
+    new THREE.Object3D();
+
+for (
+    let i = 0;
+    i < 80;
+    i++
+) {
+
+    const angle =
+        Math.random() *
+        Math.PI *
+        2;
+
+    const radius =
+        30 +
+        Math.random() *
+        50;
+
+    const x =
+        Math.cos(angle) *
+        radius;
+
+    const z =
+        Math.sin(angle) *
+        radius;
+
+    treeDummy.position.set(
+        x,
+        1.25,
+        z
+    );
+
+    treeDummy.scale.set(
+        1,
+        1,
+        1
+    );
+
+    treeDummy.updateMatrix();
+
+    trunk.setMatrixAt(
+        i,
+        treeDummy.matrix
+    );
+
+    treeDummy.position.set(
+        x,
+        3,
+        z
+    );
+
+    treeDummy.scale.set(
+        1.4,
+        1.4,
+        1.4
+    );
+
+    treeDummy.updateMatrix();
+
+    crown.setMatrixAt(
+        i,
+        treeDummy.matrix
+    );
+}
+
+trunk.instanceMatrix.needsUpdate =
+    true;
+
+crown.instanceMatrix.needsUpdate =
+    true;
+
+scene.add(
+    trunk
+);
+
+scene.add(
+    crown
+);
+
+/* ================================================= */
+/* MODELO DE JUGADOR */
+/* ================================================= */
+
+function makePlayer(
+    color,
+    name
+) {
+
+    const group =
+        new THREE.Group();
+
+    /* BODY */
+
+    const body =
+        new THREE.Mesh(
+
+            new THREE.CylinderGeometry(
+                0.42,
+                0.48,
+                1.1,
+                10
+            ),
+
+            new THREE.MeshStandardMaterial(
+                {
+                    color: color
+                }
+            )
+
+        );
+
+    body.position.y =
+        0.75;
+
+    body.castShadow =
+        true;
+
+    group.add(
+        body
+    );
+
+    /* HEAD */
+
+    const head =
+        new THREE.Mesh(
+
+            new THREE.SphereGeometry(
+                0.32,
+                12,
+                12
+            ),
+
+            new THREE.MeshStandardMaterial(
+                {
+                    color: 0xf1c40f
+                }
+            )
+
+        );
+
+    head.position.y =
+        1.55;
+
+    head.castShadow =
+        true;
+
+    group.add(
+        head
+    );
+
+    /* GUN */
+
+    const gun =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                0.16,
+                0.16,
+                0.8
+            ),
+
+            new THREE.MeshStandardMaterial(
+                {
+                    color: 0x222222
+                }
+            )
+
+        );
+
+    gun.position.set(
+        0.28,
+        1.0,
+        -0.35
+    );
+
+    gun.castShadow =
+        true;
+
+    group.add(
+        gun
+    );
+
+    /* NAME */
+
+    if (name) {
+
+        const canvas =
+            document.createElement(
+                'canvas'
+            );
+
+        canvas.width =
+            512;
+
+        canvas.height =
+            128;
+
+        const ctx =
+            canvas.getContext(
+                '2d'
+            );
+
+        ctx.clearRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        ctx.font =
+            'bold 52px Arial';
+
+        ctx.textAlign =
+            'center';
+
+        ctx.textBaseline =
+            'middle';
+
+        ctx.lineWidth =
+            8;
+
+        ctx.strokeStyle =
+            '#000';
+
+        ctx.strokeText(
+            name,
+            256,
+            64
+        );
+
+        ctx.fillStyle =
+            '#fff';
+
+        ctx.fillText(
+            name,
+            256,
+            64
+        );
+
+        const texture =
+            new THREE.CanvasTexture(
+                canvas
+            );
+
+        const sprite =
+            new THREE.Sprite(
+                new THREE.SpriteMaterial(
+                    {
+                        map:
+                            texture,
+
+                        transparent:
+                            true,
+
+                        depthTest:
+                            false
+                    }
+                )
+            );
+
+        sprite.scale.set(
+            3,
+            0.75,
+            1
+        );
+
+        sprite.position.y =
+            2.35;
+
+        group.add(
+            sprite
+        );
+    }
+
+    return group;
+}
+
+/* ================================================= */
+/* MODELO ZOMBIE */
+/* ================================================= */
+
+function makeZombie(
+    type
+) {
+
+    let color;
+
+    if (
+        type === 'tank'
+    ) {
+
+        color =
+            0x8e44ad;
+
+    } else if (
+        type === 'runner'
+    ) {
+
+        color =
+            0xd4ac0d;
+
+    } else {
+
+        color =
+            0x8b2e2e;
+    }
+
+    const group =
+        new THREE.Group();
+
+    const body =
+        new THREE.Mesh(
+
+            new THREE.CylinderGeometry(
+                0.35,
+                0.42,
+                0.9,
+                10
+            ),
+
+            new THREE.MeshStandardMaterial(
+                {
+                    color:
+                        color
+                }
+            )
+
+        );
+
+    body.position.y =
+        0.65;
+
+    body.castShadow =
+        true;
+
+    group.add(
+        body
+    );
+
+    const head =
+        new THREE.Mesh(
+
+            new THREE.SphereGeometry(
+                0.3,
+                10,
+                10
+            ),
+
+            new THREE.MeshStandardMaterial(
+                {
+                    color:
+                        0x8b3a3a
+                }
+            )
+
+        );
+
+    head.position.y =
+        1.35;
+
+    head.castShadow =
+        true;
+
+    group.add(
+        head
+    );
+
+    const eyeMaterial =
+        new THREE.MeshBasicMaterial(
+            {
+                color:
+                    0xff0000
+            }
+        );
+
+    const eyeLeft =
+        new THREE.Mesh(
+
+            new THREE.SphereGeometry(
+                0.06,
+                6,
+                6
+            ),
+
+            eyeMaterial
+
+        );
+
+    eyeLeft.position.set(
+        -0.12,
+        1.4,
+        -0.26
+    );
+
+    group.add(
+        eyeLeft
+    );
+
+    const eyeRight =
+        new THREE.Mesh(
+
+            new THREE.SphereGeometry(
+                0.06,
+                6,
+                6
+            ),
+
+            eyeMaterial
+
+        );
+
+    eyeRight.position.set(
+        0.12,
+        1.4,
+        -0.26
+    );
+
+    group.add(
+        eyeRight
+    );
+
+    return group;
+}
+
+/* ================================================= */
+/* ESTADO LOCAL */
+/* ================================================= */
+
+let socket =
+    null;
+
+let myId =
+    null;
+
+let myMesh =
+    null;
+
+let gameStarted =
+    false;
+
+let meAlive =
+    true;
+
+const me = {
+    x: 0,
+    z: 0
+};
+
+const meServer = {
+    x: 0,
+    z: 0
+};
+
+/* ================================================= */
+/* ENTIDADES */
+/* ================================================= */
+
+const remotePlayers =
+    new Map();
+
+const zombieMap =
+    new Map();
+
+const activeBullets =
+    new Map();
+
+/* ================================================= */
+/* CÁMARA */
+/* ================================================= */
+
+/*
+ * camTheta = yaw   (igual a camera.rotation.y)
+ * camPhi   = pitch (igual a camera.rotation.x)
+ *
+ * Esta es la MISMA convención que usa el servidor
+ * (ver getForwardVector/getRightVector/getAimDirection
+ * en server.js). Si esto se desalinea, el jugador ve una
+ * cosa pero el servidor mueve/dispara hacia otra.
+ */
+
+let camTheta =
+    0;
+
+let camPhi =
+    0;
+
+const CAM_HEIGHT =
+    1.65;
+
+const MOUSE_SENSITIVITY =
+    0.0022;
+
+/* ================================================= */
+/* INPUT */
+/* ================================================= */
+
+const keys = {
+
+    w: false,
+    a: false,
+    s: false,
+    d: false
+
+};
+
+let chatMode =
+    false;
+
+let pointerLocked =
+    false;
+
+let lastInputSend =
+    0;
+
+/* ================================================= */
+/* CONEXIÓN */
+/* ================================================= */
+
+$('join').addEventListener(
+    'click',
+    connectGame
+);
+
+nameEl.addEventListener(
+    'keydown',
+    function(e) {
+
+        if (
+            e.key === 'Enter'
+        ) {
+
+            e.preventDefault();
+
+            connectGame();
+        }
+
+    }
+);
+
+/* ================================================= */
+/* CONNECT GAME */
+/* ================================================= */
+
+function connectGame() {
+
+    if (socket) {
+        return;
+    }
+
+    let name =
+        nameEl.value.trim();
+
+    if (!name) {
+        name =
+            'Jugador';
+    }
+
+    name =
+        name.slice(
+            0,
+            16
+        );
+
+    socket =
+        io(
+            {
+                transports:
+                    [
+                        'websocket',
+                        'polling'
+                    ]
+            }
+        );
+
+    socket.on(
+        'connect',
+        function() {
+
+            myId =
+                socket.id;
+
+            socket.emit(
+                'join',
+                {
+                    name:
+                        name
+                }
+            );
+
+            myMesh =
+                makePlayer(
+                    0x3498db,
+                    name
+                );
+
+            /*
+             * Primera persona:
+             * ocultamos nuestro cuerpo.
+             */
+
+            myMesh.visible =
+                false;
+
+            scene.add(
+                myMesh
+            );
+
+            loginEl.classList.add(
+                'hidden'
+            );
+
+            nameEl.blur();
+
+            renderer.domElement.focus();
+
+            camTheta =
+                0;
+
+            camPhi =
+                0;
+
+            gameStarted =
+                true;
+
+            mouseStatusEl.textContent =
+                'Clic para capturar el mouse';
+
+            mouseStatusEl.classList.add(
+                'show'
+            );
+
+            setTimeout(
+                function() {
+
+                    mouseStatusEl.classList.remove(
+                        'show'
+                    );
+
+                },
+                2500
+            );
+
+            console.log(
+                'Conectado:',
+                socket.id
+            );
+        }
+    );
+
+    socket.on(
+        's',
+        onState
+    );
+
+    socket.on(
+        'chat',
+        function(data) {
+
+            if (!data) {
+                return;
+            }
+
+            addChat(
+                data.name,
+                data.text
+            );
+        }
+    );
+
+    socket.on(
+        'disconnect',
+        function() {
+
+            clearKeys();
+
+            if (
+                document.pointerLockElement
+            ) {
+
+                document.exitPointerLock();
+            }
+
+            pointerLocked =
+                false;
+
+            console.log(
+                'Desconectado'
+            );
+        }
+    );
+
+    socket.on(
+        'connect_error',
+        function(error) {
+
+            console.error(
+                'Error Socket.IO:',
+                error
+            );
+
+            loginEl
+                .querySelector(
+                    '.hint'
+                )
+                .textContent =
+                'Error de conexión: ' +
+                error.message;
+        }
+    );
+}
+
+/* ================================================= */
+/* CHAT */
+/* ================================================= */
+
+function escapeHTML(
+    value
+) {
+
+    return String(
+        value
+    ).replace(
+        /[&<>"']/g,
+        function(char) {
+
+            const map = {
+
+                '&':
+                    '&amp;',
+
+                '<':
+                    '&lt;',
+
+                '>':
+                    '&gt;',
+
+                '"':
+                    '&quot;',
+
+                "'":
+                    '&#39;'
+            };
+
+            return map[char];
+        }
+    );
+}
+
+function addChat(
+    name,
+    text
+) {
+
+    const div =
+        document.createElement(
+            'div'
+        );
+
+    div.innerHTML =
+        '<span class="w">' +
+        escapeHTML(name) +
+        ':</span> ' +
+        escapeHTML(text);
+
+    chatEl.appendChild(
+        div
+    );
+
+    while (
+        chatEl.children.length >
+        8
+    ) {
+
+        chatEl.removeChild(
+            chatEl.firstChild
+        );
+    }
+}
+
+/* ================================================= */
+/* TECLADO */
+/* ================================================= */
+
+window.addEventListener(
+    'keydown',
+    function(e) {
+
+        if (
+            e.target === ciEl
+        ) {
+
+            return;
+        }
+
+        if (
+            chatMode
+        ) {
+
+            return;
+        }
+
+        const key =
+            e.key.toLowerCase();
+
+        if (
+            key === 'w' ||
+            key === 'a' ||
+            key === 's' ||
+            key === 'd'
+        ) {
+
+            keys[key] =
+                true;
+
+            e.preventDefault();
+
+            return;
+        }
+
+        if (
+            key === 't'
+        ) {
+
+            openChat();
+
+            e.preventDefault();
+
+            return;
+        }
+
+    }
+);
+
+window.addEventListener(
+    'keyup',
+    function(e) {
+
+        if (
+            e.target === ciEl
+        ) {
+
+            return;
+        }
+
+        const key =
+            e.key.toLowerCase();
+
+        if (
+            key === 'w' ||
+            key === 'a' ||
+            key === 's' ||
+            key === 'd'
+        ) {
+
+            keys[key] =
+                false;
+
+            e.preventDefault();
+        }
+
+    }
+);
+
+window.addEventListener(
+    'blur',
+    clearKeys
+);
+
+function clearKeys() {
+
+    keys.w =
+        false;
+
+    keys.a =
+        false;
+
+    keys.s =
+        false;
+
+    keys.d =
+        false;
+}
+
+/* ================================================= */
+/* MOUSE */
+/* ================================================= */
+
+renderer.domElement.addEventListener(
+    'mousedown',
+    function(e) {
+
+        if (
+            chatMode
+        ) {
+
+            return;
+        }
+
+        if (
+            e.button !== 0
+        ) {
+
+            return;
+        }
+
+        /*
+         * Primer clic:
+         * captura el mouse.
+         */
+
+        if (
+            document.pointerLockElement !==
+            renderer.domElement
+        ) {
+
+            renderer.domElement.requestPointerLock();
+
+            renderer.domElement.focus();
+
+            return;
+        }
+
+        /*
+         * Segundo clic y siguientes:
+         * disparar.
+         */
+
+        if (
+            socket &&
+            socket.connected &&
+            meAlive
+        ) {
+
+            socket.emit(
+                'shoot'
+            );
+        }
+
+    }
+);
+
+/* ================================================= */
+/* CONTEXT MENU */
+/* ================================================= */
+
+renderer.domElement.addEventListener(
+    'contextmenu',
+    function(e) {
+
+        e.preventDefault();
+
+    }
+);
+
+/* ================================================= */
+/* POINTER LOCK */
+/* ================================================= */
+
+document.addEventListener(
+    'pointerlockchange',
+    function() {
+
+        pointerLocked =
+            document.pointerLockElement ===
+            renderer.domElement;
+
+        if (
+            pointerLocked
+        ) {
+
+            mouseStatusEl.classList.remove(
+                'show'
+            );
+
+            renderer.domElement.focus();
+
+        } else {
+
+            clearKeys();
+
+            if (
+                gameStarted &&
+                !chatMode
+            ) {
+
+                mouseStatusEl.textContent =
+                    'Clic para capturar el mouse';
+
+                mouseStatusEl.classList.add(
+                    'show'
+                );
+
+                setTimeout(
+                    function() {
+
+                        if (
+                            !pointerLocked &&
+                            !chatMode
+                        ) {
+
+                            mouseStatusEl.classList.remove(
+                                'show'
+                            );
+                        }
+
+                    },
+                    2000
+                );
+            }
+        }
+
+    }
+);
+
+/* ================================================= */
+/* MOVIMIENTO DEL MOUSE */
+/* ================================================= */
+
+document.addEventListener(
+    'mousemove',
+    function(e) {
+
+        if (
+            !pointerLocked ||
+            chatMode
+        ) {
+
+            return;
+        }
+
+        /*
+         * Horizontal.
+         *
+         * Con camera.rotation.order = 'YXZ' y
+         * camera.rotation.y = camTheta, restar
+         * movementX gira la vista hacia la derecha
+         * cuando el mouse se mueve a la derecha
+         * (convención estándar de three.js).
+         */
+
+        camTheta -=
+            e.movementX *
+            MOUSE_SENSITIVITY;
+
+        /*
+         * Vertical.
+         */
+
+        camPhi -=
+            e.movementY *
+            MOUSE_SENSITIVITY;
+
+        /*
+         * Limitar mirada vertical.
+         */
+
+        camPhi =
+            Math.max(
+                -1.35,
+                Math.min(
+                    1.35,
+                    camPhi
+                )
+            );
+
+    }
+);
+
+/* ================================================= */
+/* CHAT */
+/* ================================================= */
+
+function openChat() {
+
+    chatMode =
+        true;
+
+    clearKeys();
+
+    if (
+        document.pointerLockElement
+    ) {
+
+        document.exitPointerLock();
+    }
+
+    ciEl.value =
+        '';
+
+    ciEl.classList.add(
+        'show'
+    );
+
+    ciEl.focus();
+}
+
+function closeChat() {
+
+    chatMode =
+        false;
+
+    ciEl.classList.remove(
+        'show'
+    );
+
+    ciEl.blur();
+
+    renderer.domElement.focus();
+}
+
+ciEl.addEventListener(
+    'keydown',
+    function(e) {
+
+        if (
+            e.key === 'Enter'
+        ) {
+
+            const text =
+                ciEl.value.trim();
+
+            if (
+                text &&
+                socket &&
+                socket.connected
+            ) {
+
+                socket.emit(
+                    'chat',
+                    text
+                );
+            }
+
+            closeChat();
+
+            e.preventDefault();
+
+            e.stopPropagation();
+
+            return;
+        }
+
+        if (
+            e.key === 'Escape'
+        ) {
+
+            closeChat();
+
+            e.preventDefault();
+
+            e.stopPropagation();
+
+            return;
+        }
+
+        e.stopPropagation();
+
+    }
+);
+
+/* ================================================= */
+/* RESIZE */
+/* ================================================= */
+
+window.addEventListener(
+    'resize',
+    function() {
+
+        camera.aspect =
+            window.innerWidth /
+            window.innerHeight;
+
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(
+            window.innerWidth,
+            window.innerHeight
+        );
+
+    }
+);
+
+/* ================================================= */
+/* ESTADO DEL SERVIDOR */
+/* ================================================= */
+
+function onState(
+    state
+) {
+
+    if (
+        !state ||
+        !state.me
+    ) {
+
+        return;
+    }
+
+    meServer.x =
+        Number(
+            state.me.x
+        ) || 0;
+
+    meServer.z =
+        Number(
+            state.me.z
+        ) || 0;
+
+    meAlive =
+        !!state.me.a;
+
+    /* ============================================= */
+    /* HUD */
+    /* ============================================= */
+
+    sEl.textContent =
+        state.me.s || 0;
+
+    kEl.textContent =
+        state.me.k || 0;
+
+    onEl.textContent =
+        state.n || 1;
+
+    /* ============================================= */
+    /* HP */
+    /* ============================================= */
+
+    const health =
+        Math.max(
+            0,
+            Number(
+                state.me.h
+            ) || 0
+        );
+
+    hpEl.style.width =
+        health + '%';
+
+    hptEl.textContent =
+        Math.ceil(
+            health
+        ) +
+        ' / 100';
+
+    /* ============================================= */
+    /* MUERTE */
+    /* ============================================= */
+
+    deadEl.classList.toggle(
+        'show',
+        !meAlive
+    );
+
+    /* ============================================= */
+    /* ENTIDADES */
+    /* ============================================= */
+
+    syncEntities(
+        'p',
+        Array.isArray(
+            state.p
+        )
+            ? state.p
+            : []
+    );
+
+    syncEntities(
+        'z',
+        Array.isArray(
+            state.z
+        )
+            ? state.z
+            : []
+    );
+
+    syncEntities(
+        'b',
+        Array.isArray(
+            state.b
+        )
+            ? state.b
+            : []
+    );
+}
+
+/* ================================================= */
+/* SINCRONIZAR ENTIDADES */
+/* ================================================= */
+
+function syncEntities(
+    type,
+    list
+) {
+
+    let store;
+
+    if (
+        type === 'p'
+    ) {
+
+        store =
+            remotePlayers;
+
+    } else if (
+        type === 'z'
+    ) {
+
+        store =
+            zombieMap;
+
+    } else {
+
+        store =
+            activeBullets;
+    }
+
+    const seen =
+        new Set();
+
+    for (
+        const item
+        of list
+    ) {
+
+        /*
+         * No mostrar nuestro
+         * propio jugador como remoto.
+         */
+
+        if (
+            type === 'p' &&
+            item.i === myId
+        ) {
+
+            continue;
+        }
+
+        seen.add(
+            item.i
+        );
+
+        let entity =
+            store.get(
+                item.i
+            );
+
+        /* ========================================= */
+        /* CREAR */
+        /* ========================================= */
+
+        if (!entity) {
+
+            let mesh;
+
+            if (
+                type === 'p'
+            ) {
+
+                mesh =
+                    makePlayer(
+                        0xe74c3c,
+                        item.n ||
+                        'Jugador'
+                    );
+
+            } else if (
+                type === 'z'
+            ) {
+
+                mesh =
+                    makeZombie(
+                        item.t ||
+                        'normal'
+                    );
+
+            } else {
+
+                mesh =
+                    new THREE.Mesh(
+
+                        new THREE.SphereGeometry(
+                            0.15,
+                            8,
+                            8
+                        ),
+
+                        new THREE.MeshBasicMaterial(
+                            {
+                                color:
+                                    0xffcc33
+                            }
+                        )
+
+                    );
+            }
+
+            const initialY =
+                type === 'b'
+                    ? Number(
+                        item.y
+                    ) || 0
+                    : 0;
+
+            mesh.position.set(
+
+                Number(
+                    item.x
+                ) || 0,
+
+                initialY,
+
+                Number(
+                    item.z
+                ) || 0
+
+            );
+
+            scene.add(
+                mesh
+            );
+
+            entity = {
+
+                mesh:
+                    mesh,
+
+                tx:
+                    Number(
+                        item.x
+                    ) || 0,
+
+                ty:
+                    initialY,
+
+                tz:
+                    Number(
+                        item.z
+                    ) || 0,
+
+                /*
+                 * `item.r` (yaw del jugador remoto en el
+                 * servidor) usa la MISMA convención que
+                 * camera.rotation.y, así que se puede
+                 * asignar directamente a mesh.rotation.y.
+                 */
+
+                rotation:
+                    Number(
+                        item.r
+                    ) || 0
+            };
+
+            store.set(
+                item.i,
+                entity
+            );
+        }
+
+        /* ========================================= */
+        /* ACTUALIZAR */
+        /* ========================================= */
+
+        entity.tx =
+            Number(
+                item.x
+            ) || 0;
+
+        entity.ty =
+            Number(
+                item.y
+            ) || 0;
+
+        entity.tz =
+            Number(
+                item.z
+            ) || 0;
+
+        if (
+            type === 'p'
+        ) {
+
+            entity.rotation =
+                Number(
+                    item.r
+                ) || 0;
+        }
+    }
+
+    /* ============================================= */
+    /* ELIMINAR */
+    /* ============================================= */
+
+    for (
+        const [
+            id,
+            entity
+        ]
+        of store
+    ) {
+
+        if (
+            !seen.has(id)
+        ) {
+
+            scene.remove(
+                entity.mesh
+            );
+
+            store.delete(
+                id
+            );
+        }
+    }
+}
+
+/* ================================================= */
+/* ENVIAR INPUT */
+/* ================================================= */
+
+function sendInput() {
+
+    if (
+        !socket ||
+        !socket.connected ||
+        !meAlive ||
+        chatMode
+    ) {
+
+        return;
+    }
+
+    const now =
+        performance.now();
+
+    /*
+     * 30 inputs por segundo.
+     */
+
+    if (
+        now -
+        lastInputSend <
+        33
+    ) {
+
+        return;
+    }
+
+    lastInputSend =
+        now;
+
+    const forward =
+        (
+            keys.w
+                ? 1
+                : 0
+        ) -
+        (
+            keys.s
+                ? 1
+                : 0
+        );
+
+    const right =
+        (
+            keys.d
+                ? 1
+                : 0
+        ) -
+        (
+            keys.a
+                ? 1
+                : 0
+        );
+
+    /*
+     * MUY IMPORTANTE:
+     *
+     * a = yaw   = camTheta = camera.rotation.y
+     * p = pitch = camPhi   = camera.rotation.x
+     *
+     * El servidor usa exactamente esta misma
+     * convención (ver server.js) para mover al
+     * jugador y calcular la dirección de disparo.
+     */
+
+    socket.emit(
+        'input',
+        {
+
+            f:
+                forward,
+
+            r:
+                right,
+
+            a:
+                camTheta,
+
+            p:
+                camPhi
+
+        }
+    );
+}
+
+/* ================================================= */
+/* GAME LOOP */
+/* ================================================= */
+
+let lastFrame =
+    performance.now();
+
+function tick(
+    now
+) {
+
+    requestAnimationFrame(
+        tick
+    );
+
+    const dt =
+        Math.min(
+            (
+                now -
+                lastFrame
+            ) /
+            1000,
+            0.1
+        );
+
+    lastFrame =
+        now;
+
+    if (
+        !gameStarted
+    ) {
+
+        renderer.render(
+            scene,
+            camera
+        );
+
+        return;
+    }
+
+    /* ============================================= */
+    /* INPUT */
+    /* ============================================= */
+
+    sendInput();
+
+    /* ============================================= */
+    /* INTERPOLACIÓN LOCAL */
+    /* ============================================= */
+
+    const localLerp =
+        1 -
+        Math.pow(
+            0.0001,
+            dt
+        );
+
+    me.x +=
+        (
+            meServer.x -
+            me.x
+        ) *
+        localLerp;
+
+    me.z +=
+        (
+            meServer.z -
+            me.z
+        ) *
+        localLerp;
+
+    /* ============================================= */
+    /* JUGADOR LOCAL */
+    /* ============================================= */
+
+    if (
+        myMesh
+    ) {
+
+        myMesh.position.set(
+            me.x,
+            0,
+            me.z
+        );
+
+        myMesh.rotation.y =
+            camTheta;
+
+        /*
+         * Oculto porque estamos
+         * en primera persona.
+         */
+
+        myMesh.visible =
+            false;
+    }
+
+    /* ============================================= */
+    /* CÁMARA */
+    /*                                               */
+    /* Rotación directa (Euler 'YXZ'), sin lookAt().  */
+    /* Esto es lo que hace que el mouse controle la    */
+    /* cámara de forma estable y consistente con lo    */
+    /* que el servidor usa para mover/disparar.        */
+    /* ============================================= */
+
+    camera.position.set(
+        me.x,
+        CAM_HEIGHT,
+        me.z
+    );
+
+    camera.rotation.y =
+        camTheta;
+
+    camera.rotation.x =
+        camPhi;
+
+    camera.rotation.z =
+        0;
+
+    /* ============================================= */
+    /* ENTIDADES */
+    /* ============================================= */
+
+    const entityLerp =
+        1 -
+        Math.pow(
+            0.001,
+            dt
+        );
+
+    /* ============================================= */
+    /* JUGADORES REMOTOS */
+    /* ============================================= */
+
+    for (
+        const entity
+        of remotePlayers.values()
+    ) {
+
+        entity.mesh.position.x +=
+            (
+                entity.tx -
+                entity.mesh.position.x
+            ) *
+            entityLerp;
+
+        entity.mesh.position.z +=
+            (
+                entity.tz -
+                entity.mesh.position.z
+            ) *
+            entityLerp;
+
+        let difference =
+            entity.rotation -
+            entity.mesh.rotation.y;
+
+        while (
+            difference >
+            Math.PI
+        ) {
+
+            difference -=
+                Math.PI * 2;
+        }
+
+        while (
+            difference <
+            -Math.PI
+        ) {
+
+            difference +=
+                Math.PI * 2;
+        }
+
+        entity.mesh.rotation.y +=
+            difference *
+            Math.min(
+                1,
+                entityLerp *
+                1.2
+            );
+    }
+
+    /* ============================================= */
+    /* ZOMBIES */
+    /* ============================================= */
+
+    for (
+        const entity
+        of zombieMap.values()
+    ) {
+
+        entity.mesh.position.x +=
+            (
+                entity.tx -
+                entity.mesh.position.x
+            ) *
+            entityLerp;
+
+        entity.mesh.position.z +=
+            (
+                entity.tz -
+                entity.mesh.position.z
+            ) *
+            entityLerp;
+    }
+
+    /* ============================================= */
+    /* BALAS */
+    /* ============================================= */
+
+    for (
+        const entity
+        of activeBullets.values()
+    ) {
+
+        entity.mesh.position.x +=
+            (
+                entity.tx -
+                entity.mesh.position.x
+            ) *
+            0.7;
+
+        entity.mesh.position.y +=
+            (
+                entity.ty -
+                entity.mesh.position.y
+            ) *
+            0.7;
+
+        entity.mesh.position.z +=
+            (
+                entity.tz -
+                entity.mesh.position.z
+            ) *
+            0.7;
+    }
+
+    /* ============================================= */
+    /* RENDER */
+    /* ============================================= */
+
+    renderer.render(
+        scene,
+        camera
+    );
+}
+
+/* ================================================= */
+/* START */
+/* ================================================= */
+
+requestAnimationFrame(
+    tick
+);
+
+</script>
+
+</body>
+
+</html>
